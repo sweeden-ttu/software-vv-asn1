@@ -26,7 +26,9 @@ os.environ.setdefault("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
 #   export OPENAI_API_KEY="sk-..."
 #   export LANGSMITH_API_KEY="lsv2_pt_..."
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-LANGSMITH_API_KEY = os.environ.get("LANGSMITH_API_KEY", "") or os.environ.get("LANGCHAIN_API_KEY", "")
+LANGSMITH_API_KEY = os.environ.get("LANGSMITH_API_KEY", "") or os.environ.get(
+    "LANGCHAIN_API_KEY", ""
+)
 
 # CourtListener (free API for court documents)
 COURTLISTENER_API_KEY = os.environ.get("COURTLISTENER_API_KEY", "")
@@ -54,24 +56,66 @@ PACER_PASSWORD = os.environ.get("PACER_PASSWORD", "")
 
 TRUSTED_NEWS_DOMAINS = {
     # Government sources
-    "supremecourt.gov", "uscourts.gov", "congress.gov", "whitehouse.gov",
-    "justice.gov", "ftc.gov", "sec.gov", "fec.gov",
+    "supremecourt.gov",
+    "uscourts.gov",
+    "congress.gov",
+    "whitehouse.gov",
+    "justice.gov",
+    "ftc.gov",
+    "sec.gov",
+    "fec.gov",
     # Major legal news
-    "law.cornell.edu", "scotusblog.com", "courtlistener.com",
-    "pacer.gov", "govinfo.gov",
-    # State legislatures (pattern-based, checked dynamically)
+    "law.cornell.edu",
+    "scotusblog.com",
+    "courtlistener.com",
+    "pacer.gov",
+    "govinfo.gov",
+    # Texas legal resources
+    "texaslawhelp.org",
+    "texascourthelp.gov",
+    "texasbar.com",
+    # Texas law blogs
+    "edtexweblog.com",
     # Verified news
-    "reuters.com", "apnews.com", "npr.org",
+    "reuters.com",
+    "apnews.com",
+    "npr.org",
+    # Major law firms
+    "allenoverry.com",
+    "cliffordchance.com",
+    "freshfields.com",
+    "linklaters.com",
+    "slaughterandmay.com",
 }
 
 TRUSTED_COURT_DOMAINS = {
-    "uscourts.gov", "supremecourt.gov", "courtlistener.com",
-    "pacer.gov", "law.cornell.edu", "govinfo.gov",
+    "uscourts.gov",
+    "supremecourt.gov",
+    "courtlistener.com",
+    "pacer.gov",
+    "law.cornell.edu",
+    "govinfo.gov",
+    # Texas courts
+    "texascourthelp.gov",
+    "txcourts.gov",
+    "txcourts.net",
 }
 
 TRUSTED_LEGISLATION_DOMAINS = {
-    "congress.gov", "govinfo.gov", "law.cornell.edu",
-    "legiscan.com", "ncsl.org",
+    "congress.gov",
+    "govinfo.gov",
+    "law.cornell.edu",
+    "legiscan.com",
+    "ncsl.org",
+    # Texas legal resources
+    "texaslawhelp.org",
+    "texasbar.com",
+    # Major law firms
+    "allenoverry.com",
+    "cliffordchance.com",
+    "freshfields.com",
+    "linklaters.com",
+    "slaughterandmay.com",
 }
 
 
