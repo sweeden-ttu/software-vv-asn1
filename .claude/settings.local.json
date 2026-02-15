@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:data.texas.gov)",
+      "Bash(hpcc echo:*)",
+      "Bash(hpcc \"ls -la ~/ollama_agent_job.sh ~/ollama* 2>/dev/null; echo ''===''; ls -la ~/*.sh ~/*.py 2>/dev/null\")",
+      "Bash(hpcc \"cat ~/ollama_agent_job.sh\")",
+      "Bash(hpcc \"cat ~/ollama.sh\")",
+      "Bash(hpcc \"cat ~/multi_agent.py\")",
+      "Bash(hpcc \"ls -la ~/agent_*.out ~/agent_*.err 2>/dev/null | tail -10; echo ''===LATEST OUT===''; ls -t ~/agent_*.out 2>/dev/null | head -1 | xargs cat 2>/dev/null | tail -60; echo ''===LATEST ERR===''; ls -t ~/agent_*.err 2>/dev/null | head -1 | xargs cat 2>/dev/null | tail -60\")",
+      "Bash(hpcc \"cat ~/LangGraph_Demo2.py\")",
+      "Bash(hpcc \"squeue -u sweeden 2>/dev/null; echo ''===''; cat ~/run_model.sh\")",
+      "Bash(hpcc \"cat /lustre/work/sweeden/langsmith/langsmith/config.env\")",
+      "Bash(hpcc \"cat ~/ollama_subagent_job.sh\")",
+      "Bash(hpcc \"cat /lustre/work/sweeden/langsmith/langsmith/LangSmith_Demo2_job.sh\")",
+      "Bash(hpcc \"cat /lustre/work/sweeden/langsmith/langsmith/langsmith_demo2_23577855.out\")",
+      "Bash(hpcc \"ssh gpu-20-1 ''curl -s http://localhost:43411/api/tags''\")",
+      "Bash(# Check with more permissive settings \\(user-agent, follow redirects\\) for domain in oag.texas.gov tlo.texas.gov coa.courts.state.tx.us; do echo \"\"=== $domain ===\"\" curl -s -o /dev/null -w \"\"https: %{http_code} → %{redirect_url}\\\\n\"\" -L --max-time 15 -A \"\"Mozilla/5.0\"\" \"\"https://$domain\"\" curl -s -o /dev/null -w \"\"http: %{http_code} → %{redirect_url}\\\\n\"\" -L --max-time 15 -A \"\"Mozilla/5.0\"\" \"\"http://$domain\"\" # DNS check dig +short \"\"$domain\"\")",
+      "Bash(done)",
+      "WebFetch(domain:lrl.texas.gov)",
+      "WebFetch(domain:legalluminary.com)",
+      "Bash(git submodule add:*)"
+    ]
+  }
+}

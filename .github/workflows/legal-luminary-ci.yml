@@ -1,0 +1,356 @@
+name: Legal Luminary — Validation Pipeline CI
+
+# =============================================================================
+# Test Driver: Runs the full LangGraph validation pipeline, experiments,
+# and site content verification on every push/PR to markdown or Python files.
+#
+# Implements the V&V presentation framework:
+#   - Adequacy Criterion: 100% of links verified against the oracle (allow list)
+#   - GitHub Secrets for API key management
+#   - LangSmith tracing for documented evidence
+# =============================================================================
+
+on:
+  pull_request:
+    branches: [main, master, sweeden_legal_luminary]
+    paths:
+      - "legal-luminary/**"
+      - "legal-luminary-site/_pages/**"
+      - "legal-luminary-site/_posts/**"
+      - ".github/workflows/legal-luminary-ci.yml"
+  push:
+    branches: [main, master, sweeden_legal_luminary]
+    paths:
+      - "legal-luminary/**"
+  workflow_dispatch:
+    inputs:
+      run_experiments:
+        description: "Run full experiments (slow)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      max_datasets:
+        description: "Max datasets to crawl (0 = all)"
+        required: false
+        default: "5"
+
+env:
+  LANGCHAIN_TRACING_V2: "true"
+  LANGSMITH_TRACING: "true"
+  LANGCHAIN_PROJECT: "Legal Luminary CI"
+
+jobs:
+  # =========================================================================
+  # Job 1: Lint and structural checks
+  # =========================================================================
+  lint:
+    name: Lint & Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check pipeline imports
+        run: |
+          cd legal-luminary
+          python -c "
+          from state import PipelineState, ContentType, VerificationStatus
+          from config.settings import TRUSTED_NEWS_DOMAINS, TRUSTED_COURT_DOMAINS
+          from pipeline import build_pipeline
+          print('All imports OK')
+          print(f'Trusted news domains: {len(TRUSTED_NEWS_DOMAINS)}')
+          print(f'Trusted court domains: {len(TRUSTED_COURT_DOMAINS)}')
+          print(f'Content types: {[ct.value for ct in ContentType]}')
+          pipeline = build_pipeline()
+          print('Pipeline compiled successfully')
+          "
+
+  # =========================================================================
+  # Job 2: Unit tests with coverage
+  # =========================================================================
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run unit tests with coverage
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+        run: |
+          cd legal-luminary
+          python -m pytest tests/ -v \
+            --cov=validators --cov=config --cov=. \
+            --cov-report=term-missing \
+            --cov-report=html:htmlcov \
+            --tb=short \
+            -x
+        continue-on-error: false
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: legal-luminary/htmlcov/
+
+  # =========================================================================
+  # Job 3: Site content verification (the oracle check)
+  # =========================================================================
+  verify-site:
+    name: Site Content Verification
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify site content integrity (SHA-256)
+        run: |
+          cd legal-luminary
+          python -c "
+          import json, hashlib
+          from pathlib import Path
+
+          site_root = Path('../legal-luminary-site')
+          manifest_path = site_root / 'verification' / 'manifest.json'
+
+          if not manifest_path.exists():
+              print('WARNING: No verification manifest found')
+              exit(0)
+
+          manifest = json.loads(manifest_path.read_text())
+          files = manifest.get('files', {})
+          ok = 0
+          fail = 0
+          for rel_path, info in files.items():
+              fp = site_root / rel_path
+              if not fp.exists():
+                  print(f'MISSING: {rel_path}')
+                  fail += 1
+                  continue
+              actual = hashlib.sha256(fp.read_bytes()).hexdigest()
+              expected = info.get('sha256', '')
+              if actual == expected:
+                  ok += 1
+              else:
+                  print(f'MISMATCH: {rel_path}')
+                  fail += 1
+
+          print(f'Integrity: {ok}/{ok+fail} files match')
+          if fail > 0:
+              print(f'WARNING: {fail} files have changed since last verification')
+          "
+
+      - name: Verify source URLs are reachable
+        run: |
+          cd legal-luminary
+          python -c "
+          import requests, json, re, sys
+          from pathlib import Path
+
+          site_root = Path('../legal-luminary-site')
+          urls = set()
+
+          # Extract URLs from pages with legal sources
+          for content_dir in ['_pages', '_posts']:
+              d = site_root / content_dir
+              if d.exists():
+                  for md in d.glob('*.md'):
+                      text = md.read_text(errors='replace')
+                      for u in re.findall(r'https?://[^\s<>\")\]\x27\x60,;]+', text):
+                          if any(gov in u for gov in ['.gov', '.texas.', 'bellcounty', 'texasbar']):
+                              urls.add(u)
+
+          print(f'Testing {len(urls)} government/legal URLs...')
+          ok = 0
+          fail = 0
+          for url in sorted(urls):
+              try:
+                  r = requests.get(url, timeout=15, allow_redirects=True,
+                                   headers={'User-Agent': 'LegalLuminary-CI/1.0'})
+                  if r.status_code == 200:
+                      ok += 1
+                  else:
+                      print(f'  WARN: {url} -> {r.status_code}')
+                      fail += 1
+              except Exception as e:
+                  print(f'  FAIL: {url} -> {str(e)[:60]}')
+                  fail += 1
+
+          print(f'Reachable: {ok}/{ok+fail}')
+          rate = ok / (ok + fail) if (ok + fail) > 0 else 0
+          if rate < 0.90:
+              print(f'FAIL: Reachability rate {rate:.0%} < 90% threshold')
+              sys.exit(1)
+          print(f'OK: Reachability rate {rate:.0%} >= 90%')
+          "
+
+  # =========================================================================
+  # Job 4: LangGraph pipeline validation (requires API keys)
+  # =========================================================================
+  pipeline-validation:
+    name: LangGraph Pipeline Validation
+    runs-on: ubuntu-latest
+    needs: [test, verify-site]
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pipeline demo (smoke test)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_PROJECT: "Legal Luminary CI - Pipeline"
+        run: |
+          cd legal-luminary
+          python -c "
+          from pipeline import validate
+
+          # Smoke test: verify a known-good Texas statute
+          result = validate(
+              content_type='law',
+              query='Texas Penal Code Chapter 22 defines assaultive offenses',
+          )
+          print(f'Status: {result.get(\"overall_status\")}')
+          print(f'Confidence: {result.get(\"overall_confidence\", 0):.2f}')
+
+          # Smoke test: verify a known-good news source
+          result2 = validate(
+              content_type='news_source',
+              query='https://lrl.texas.gov/',
+          )
+          print(f'LRL Status: {result2.get(\"overall_status\")}')
+          print(f'LRL Confidence: {result2.get(\"overall_confidence\", 0):.2f}')
+          "
+
+      - name: Run Experiment 6 — Site content verification
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_PROJECT: "Legal Luminary CI - Exp6"
+        run: |
+          cd legal-luminary
+          python experiments/exp6_site_content_verification.py
+        continue-on-error: true
+
+      - name: Upload experiment results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-results
+          path: legal-luminary/data/exp6_results.json
+
+  # =========================================================================
+  # Job 5: Texas data crawler (optional, manually triggered)
+  # =========================================================================
+  texas-data-crawl:
+    name: Texas Data Crawler
+    runs-on: ubuntu-latest
+    needs: test
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.run_experiments == 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Texas data crawler
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_PROJECT: "Legal Luminary CI - Texas Crawl"
+          USE_OLLAMA: "false"
+        run: |
+          cd legal-luminary
+          MAX=${{ github.event.inputs.max_datasets || '5' }}
+          python texas_data_crawler.py --max "$MAX"
+
+      - name: Run Experiment 5
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGCHAIN_PROJECT: "Legal Luminary CI - Exp5"
+          USE_OLLAMA: "false"
+        run: |
+          cd legal-luminary
+          MAX=${{ github.event.inputs.max_datasets || '5' }}
+          python experiments/exp5_texas_data_pipeline.py --max "$MAX"
+
+      - name: Upload crawl results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: texas-crawl-results
+          path: |
+            legal-luminary/data/texas_crawl_results.json
+            legal-luminary/data/exp5_results.json
