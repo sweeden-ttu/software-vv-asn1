@@ -1,0 +1,18 @@
+Starting Ollama on port 55131
+Running vagueness checker on dataset...
+Processing 9 rows...
+[1/9] What is sound?... -> VAGUE
+[2/9] How does string theory work?... -> VAGUE
+[3/9] How does a democracy work?... -> VAGUE
+[4/9] Why is the sky blue?... -> VAGUE
+[5/9] How does photosynthesis work?... -> VAGUE
+[6/9] What is LangGraph?... -> VAGUE
+[7/9] What is the Langchain framework?... -> VAGUE
+[8/9] What is LangSmith by LangChain?... -> VAGUE
+[9/9] What is trustcall library?... -> VAGUE
+=== SUMMARY ===
+VAGUE: 9
+NOT_VAGUE: 0
+Results saved to: vagueness_results.csv
+Done
+

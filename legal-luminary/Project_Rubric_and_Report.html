@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Luminary — Project Rubric &amp; Report</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f7fa;color:#1a1a2e;line-height:1.7;font-size:15px}
+  .container{max-width:1000px;margin:0 auto;padding:20px}
+  header{background:linear-gradient(135deg,#0f172a,#1e3a5f,#0f3460);color:#fff;padding:48px 24px;text-align:center;border-radius:14px;margin-bottom:32px}
+  header h1{font-size:2em;margin-bottom:6px}
+  header .subtitle{opacity:.85;font-size:1.05em}
+  header .meta{opacity:.7;font-size:.85em;margin-top:8px}
+  .section{background:#fff;border-radius:12px;padding:28px 32px;margin-bottom:22px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .section h2{color:#0f3460;font-size:1.35em;border-bottom:3px solid #e94560;display:inline-block;padding-bottom:6px;margin-bottom:16px}
+  .section h3{color:#1e3a5f;font-size:1.1em;margin:18px 0 8px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.85em}
+  th{background:#0f3460;color:#fff;padding:10px 8px;text-align:left}
+  td{padding:8px;border-bottom:1px solid #e8ecf1}
+  tr:nth-child(even){background:#f8f9fc}
+  .mark{font-weight:700;color:#0f3460}
+  .total{background:#eef5ff;font-weight:700}
+  .pass{color:#27ae60;font-weight:700}
+  .blog{background:linear-gradient(135deg,#fafbff,#f0f4ff);border-left:4px solid #3b82f6;padding:20px 24px;border-radius:0 10px 10px 0;margin:14px 0}
+  .blog h4{color:#1e40af;margin-bottom:6px}
+  .blog p{font-size:.92em;color:#334155}
+  .coverage-bar{background:#e8ecf1;border-radius:8px;height:26px;position:relative;margin:10px 0;overflow:hidden}
+  .coverage-fill{background:linear-gradient(90deg,#27ae60,#2ecc71);height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#fff;font-weight:700;font-size:.88em}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+  .stat{background:linear-gradient(135deg,#f8f9fc,#eef1f7);border-radius:10px;padding:18px;text-align:center;border-left:4px solid #0f3460}
+  .stat .num{font-size:1.8em;font-weight:800;color:#0f3460}
+  .stat .lbl{font-size:.82em;color:#555;margin-top:2px}
+  code{background:#f0f2f5;padding:2px 6px;border-radius:4px;font-size:.88em;font-family:Consolas,monospace}
+  pre{background:#0f172a;color:#a4f4c2;padding:14px;border-radius:8px;overflow-x:auto;font-size:.8em;line-height:1.5;margin:10px 0}
+  .file-item{display:flex;align-items:center;padding:10px 14px;background:#f8f9fc;border-radius:6px;margin:5px 0;gap:10px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72em;font-weight:600;margin-left:4px}
+  .t1{background:#fce4ec;color:#c62828}.t2{background:#e8f5e9;color:#2e7d32}.t3{background:#e3f2fd;color:#1565c0}.t4{background:#fff3e0;color:#e65100}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Trustworthy AI Legal &amp; Governmental Content Validator</h1>
+  <div class="subtitle">CS5374 Software Verification and Validation — Spring 2026</div>
+  <div class="meta">Scott Weeden | sweeden@ttu.edu | Project: Legal Luminary</div>
+</header>
+
+<!-- ============================================================ -->
+<!-- RUBRIC -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Project Rubric</h2>
+  <table>
+    <tr><th>Component</th><th>Deliverable</th><th>Points</th><th>Status</th></tr>
+    <tr><td><strong>1. Project Proposal</strong></td><td>Written proposal with hypothesis, experiments, architecture</td><td class="mark">5</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>2. Source Code — Pipeline</strong></td><td>LangGraph validation pipeline (<code>pipeline.py</code>) with 7 validator agents</td><td class="mark">15</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>3. Source Code — Validators</strong></td><td>7 validator agents: news, judge, official, election, law, court doc, template</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>4. Experiment 1</strong></td><td>Baseline hallucination rate measurement (10 ground-truth citations)</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>5. Experiment 2</strong></td><td>Pipeline effectiveness — precision, recall, hallucination rate with pipeline</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>6. Experiment 3</strong></td><td>Validator node (LangGraph) vs post-hoc verification comparison</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>7. Experiment 4</strong></td><td>Security red-team evaluation (10 adversarial tests)</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>8. EP Functional Tests</strong></td><td>20 EP test cases with tabular design + implementation</td><td class="mark">10</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>9. Structural Tests</strong></td><td>42 structural tests achieving 96%+ coverage</td><td class="mark">5</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>10. Coverage Report</strong></td><td>Statement coverage ≥80% (achieved: 96%)</td><td class="mark">5</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>11. LangSmith Tracing</strong></td><td>Full tracing enabled across all validators and pipeline</td><td class="mark">5</td><td class="pass">DONE</td></tr>
+    <tr><td><strong>12. Blog Posts</strong></td><td>3 conceptual blog posts integrated into submission</td><td class="mark">5</td><td class="pass">DONE</td></tr>
+    <tr class="total"><td colspan="2"><strong>TOTAL</strong></td><td class="mark">100</td><td></td></tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- SUMMARY STATS -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Project Summary</h2>
+  <div class="stats">
+    <div class="stat"><div class="num">7</div><div class="lbl">Validator Agents</div></div>
+    <div class="stat"><div class="num">62</div><div class="lbl">Total Tests</div></div>
+    <div class="stat"><div class="num">96%</div><div class="lbl">Statement Coverage</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl">Experiments</div></div>
+    <div class="stat"><div class="num">10</div><div class="lbl">Red-Team Attacks</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl">Blog Posts</div></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ARCHITECTURE -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Pipeline Architecture</h2>
+  <pre>
+Input (query + content_type)
+    │
+    ▼
+┌──────────────────┐
+│ classify_content  │  ← LLM auto-detects content type
+└────────┬─────────┘
+         │
+    ┌────▼────┐
+    │ ROUTER  │  ← Conditional edge based on content type
+    └────┬────┘
+         │
+    ┌────┼────┬────┬────┬────┬────┐
+    ▼    ▼    ▼    ▼    ▼    ▼    ▼
+  NEWS JUDGE OFCL ELEC  LAW COURT TMPL   ← 7 validator nodes
+    │    │    │    │    │    │    │
+    └────┴────┴────┴────┴────┴────┘
+         │
+    ┌────▼─────────────┐
+    │ aggregate_results │  ← Determine pass/fail/retry
+    └────────┬─────────┘
+         │
+    ┌────▼────┐
+    │ RETRY?  │  ← If failed &amp; retries left → loop back
+    └────┬────┘
+         │
+    ┌────▼────┐
+    │   END   │  ← Output: verified/unverified + provenance
+    └─────────┘
+  </pre>
+  <p>Each validator checks against authoritative APIs (CourtListener, Congress.gov, FEC) plus LLM cross-reference, producing weighted confidence scores with full provenance metadata.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EP TEST TABLE -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Equivalence Partitioning — 20 Functional Test Cases</h2>
+  <table>
+    <tr><th>TC#</th><th>Source</th><th>EP Classes</th><th>V/I</th><th>Test Input</th><th>Expected</th><th>Status</th></tr>
+    <tr><td>TC01</td><td>news_validator</td><td>EC1,EC4,EC10</td><td>V</td><td>.gov trusted URL</td><td>verified, conf≥0.7</td><td class="pass">PASS</td></tr>
+    <tr><td>TC02</td><td>news_validator</td><td>EC1,EC5,EC11</td><td>V</td><td>untrusted .xyz URL</td><td>conf&lt;0.7</td><td class="pass">PASS</td></tr>
+    <tr><td>TC03</td><td>news_validator</td><td>EC1,EC6,EC9</td><td>V</td><td>empty query</td><td>conf&lt;0.7</td><td class="pass">PASS</td></tr>
+    <tr><td>TC04</td><td>judge_validator</td><td>EC1,EC4,EC15</td><td>V</td><td>Chief Justice Roberts</td><td>verified</td><td class="pass">PASS</td></tr>
+    <tr><td>TC05</td><td>judge_validator</td><td>EC1,EC5,EC16</td><td>I</td><td>Judge Santa Claus</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC06</td><td>official_validator</td><td>EC1,EC4,EC19</td><td>V</td><td>Senator Ted Cruz</td><td>verified</td><td class="pass">PASS</td></tr>
+    <tr><td>TC07</td><td>official_validator</td><td>EC1,EC5,EC20</td><td>I</td><td>Senator Fakename</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC08</td><td>election_validator</td><td>EC1,EC4</td><td>V</td><td>2024 Presidential</td><td>verified</td><td class="pass">PASS</td></tr>
+    <tr><td>TC09</td><td>election_validator</td><td>EC1,EC5</td><td>I</td><td>2099 Mars Colony</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC10</td><td>law_validator</td><td>EC1,EC4,EC17</td><td>V</td><td>42 U.S.C. § 1983</td><td>verified</td><td class="pass">PASS</td></tr>
+    <tr><td>TC11</td><td>law_validator</td><td>EC1,EC5,EC18</td><td>I</td><td>Unicorn Protection Act</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC12</td><td>court_doc_validator</td><td>EC1,EC4</td><td>V</td><td>Brown v. Board 347 U.S. 483</td><td>verified</td><td class="pass">PASS</td></tr>
+    <tr><td>TC13</td><td>court_doc_validator</td><td>EC1,EC5</td><td>I</td><td>Fakename v. Imaginary State</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC14</td><td>template_validator</td><td>EC1,EC4</td><td>V</td><td>Federal Form AO 440</td><td>conf≥0.5</td><td class="pass">PASS</td></tr>
+    <tr><td>TC15</td><td>template_validator</td><td>EC1,EC5</td><td>I</td><td>Form XYZ Time Travel</td><td>rejected</td><td class="pass">PASS</td></tr>
+    <tr><td>TC16</td><td>news (utility)</td><td>EC10,EC11</td><td>V</td><td>Domain extraction</td><td>correct domains</td><td class="pass">PASS</td></tr>
+    <tr><td>TC17</td><td>news (utility)</td><td>EC10,EC11,EC12</td><td>V</td><td>Trust check</td><td>correct trust flags</td><td class="pass">PASS</td></tr>
+    <tr><td>TC18</td><td>news (utility)</td><td>EC13,EC14</td><td>V</td><td>Confidence calc</td><td>above/below threshold</td><td class="pass">PASS</td></tr>
+    <tr><td>TC19</td><td>judge (utility)</td><td>—</td><td>V</td><td>Name extraction</td><td>correct names</td><td class="pass">PASS</td></tr>
+    <tr><td>TC20</td><td>template (utility)</td><td>—</td><td>V</td><td>Checksum validation</td><td>SHA-256 + N/A</td><td class="pass">PASS</td></tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- COVERAGE -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Statement Coverage</h2>
+  <div class="coverage-bar"><div class="coverage-fill" style="width:96%">96%</div></div>
+  <pre>
+Name                                Stmts   Miss  Cover
+---------------------------------------------------------
+state.py                               57      0   100%
+validators/__init__.py                  7      0   100%
+validators/court_doc_validator.py      70      4    94%
+validators/election_validator.py       44      2    95%
+validators/judge_validator.py          54      2    96%
+validators/law_validator.py            52      2    96%
+validators/news_validator.py           68      4    94%
+validators/official_validator.py       70      3    96%
+validators/template_validator.py       46      1    98%
+---------------------------------------------------------
+TOTAL                                 468     18    96%
+62 passed</pre>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPERIMENTS -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Experiments</h2>
+  <h3>Experiment 1: Baseline Hallucination Rate</h3>
+  <p>10 ground-truth legal citations tested against GPT-4o-mini without verification. Measures proportion of hallucinated/incorrect citations.</p>
+  <h3>Experiment 2: Pipeline Effectiveness</h3>
+  <p>Same citations run through validator pipeline. Measures precision (verified correct / all verified), recall (verified correct / all correct), and post-pipeline hallucination rate.</p>
+  <h3>Experiment 3: LangGraph vs Post-Hoc</h3>
+  <p>Compares (A) LangGraph with retry logic vs (B) simple LLM + post-hoc self-verification. Measures accuracy and latency trade-offs.</p>
+  <h3>Experiment 4: Security Red-Team</h3>
+  <p>10 adversarial tests: prompt injection, source spoofing (including homograph attacks), fabricated citations/officials/laws, data exfiltration attempts, and historical manipulation.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- BLOG POSTS -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Conceptual Blog Posts</h2>
+  <p>Three blog posts explore the theoretical and practical foundations underlying this project.</p>
+
+  <div class="blog">
+    <h4>Blog 1: 2+2 No Longer Equals 4: The Wild New Frontier of AI Software Testing</h4>
+    <p>This post establishes the fundamental paradigm shift from deterministic to non-deterministic software testing. It introduces the NIST framework's seven pillars of Trustworthy AI (Safety, Resilience, Explainability, Privacy, Fairness, Reliability, Accountability) which directly inform our validator pipeline design. Key concepts applied in this project include: the distinction between Validation (dynamic, running the pipeline) and Verification (static, formal proof of correctness); the rise of Agentic testing platforms like LangChain/LangSmith for tracing; and the critical role of Red Teaming for Prompt Injection — which is exactly what Experiment 4 implements.</p>
+    <p><strong>Project connection:</strong> Our LangSmith tracing across all 7 validators implements the "peek inside the black box" approach described. Our EP tests represent the new functional testing paradigm for non-deterministic systems.</p>
+  </div>
+
+  <div class="blog">
+    <h4>Blog 2: Architecting Safety: Why the Future of Enterprise AI is Graph-Based</h4>
+    <p>This post argues that graph-based workflows (LangGraph) are the only viable path for enterprise AI safety. The "Blackboard" shared-state metaphor maps directly to our <code>PipelineState</code> TypedDict — a central state object that all validators read from and write to, with no direct environment mutation. The core insight — "the agent cannot go off the graph" — is precisely why our pipeline uses conditional routing through defined nodes rather than open-ended LLM chains. The Test Oracle Problem discussion explains why our validators use weighted confidence scores (domain trust + API verification + LLM cross-reference) rather than binary pass/fail.</p>
+    <p><strong>Project connection:</strong> Our pipeline architecture (classify → route → validate → aggregate → retry/end) is the direct implementation of the graph-based safety architecture described. Each validator is a testable node with defined inputs and outputs.</p>
+  </div>
+
+  <div class="blog">
+    <h4>Blog 3: The Mars Rover Metric: Engineering Reliability into Non-Deterministic AI Agents</h4>
+    <p>This post connects classical SDLC principles to AI agent development. The Verification vs Validation distinction maps to our two testing approaches: structural tests (verification — checking the code paths) and EP functional tests (validation — checking the product meets requirements). The Mars Rover Metric — applying formal rigor to safety-critical components — explains why our court document and judge validators use authoritative API verification (CourtListener, PACER) rather than relying solely on LLM knowledge. The Requirement Traceability Matrix concept is implemented through our provenance metadata on every output.</p>
+    <p><strong>Project connection:</strong> Temperature=0 for deterministic testing, JSON enforcement for parseable outputs, and our full provenance chain (source → verification_date → confidence → status) implement the Requirement Traceability described.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FILES -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>Deliverable Files</h2>
+  <div class="file-item"><code>legal-luminary/pipeline.py</code> <span class="tag t1">Pipeline</span> — Main LangGraph validation pipeline with 7 routes</div>
+  <div class="file-item"><code>legal-luminary/state.py</code> <span class="tag t1">Core</span> — PipelineState, ValidationResult, ProvenanceMetadata schemas</div>
+  <div class="file-item"><code>legal-luminary/config/settings.py</code> <span class="tag t1">Config</span> — API keys, trusted domains, thresholds</div>
+  <div class="file-item"><code>legal-luminary/validators/news_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/judge_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/official_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/election_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/law_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/court_doc_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/validators/template_validator.py</code> <span class="tag t2">Validator</span></div>
+  <div class="file-item"><code>legal-luminary/experiments/exp1_baseline.py</code> <span class="tag t3">Experiment</span></div>
+  <div class="file-item"><code>legal-luminary/experiments/exp2_pipeline_effectiveness.py</code> <span class="tag t3">Experiment</span></div>
+  <div class="file-item"><code>legal-luminary/experiments/exp3_validator_vs_posthoc.py</code> <span class="tag t3">Experiment</span></div>
+  <div class="file-item"><code>legal-luminary/experiments/exp4_security_redteam.py</code> <span class="tag t3">Experiment</span></div>
+  <div class="file-item"><code>legal-luminary/tests/test_ep_functional.py</code> <span class="tag t4">Tests</span> — 20 EP tests</div>
+  <div class="file-item"><code>legal-luminary/tests/test_structural.py</code> <span class="tag t4">Tests</span> — 42 structural tests</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- HOW TO RUN -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>How to Run</h2>
+  <pre>
+# Set environment variables (or add to ~/.zprofile)
+export OPENAI_API_KEY="sk-..."
+export LANGSMITH_API_KEY="lsv2_pt_..."
+export LANGCHAIN_TRACING_V2=true
+export LANGCHAIN_PROJECT="Software Validation and Verification"
+
+# Install dependencies
+pip install langgraph langchain langchain-openai langsmith pytest pytest-cov requests
+
+# Run tests
+cd legal-luminary
+python -m pytest tests/ -v                                    # All 62 tests
+python -m pytest tests/ --cov=validators --cov=state          # With coverage
+
+# Run pipeline demo
+python pipeline.py                                            # 7 demo validations
+
+# Run experiments
+python experiments/exp1_baseline.py                           # Baseline hallucination
+python experiments/exp2_pipeline_effectiveness.py             # Pipeline effectiveness
+python experiments/exp3_validator_vs_posthoc.py               # Architecture comparison
+python experiments/exp4_security_redteam.py                   # Red-team evaluation
+  </pre>
+</div>
+
+</div>
+</body>
+</html>
