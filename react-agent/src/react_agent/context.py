@@ -22,11 +22,11 @@ class Context:
     )
 
     model: Annotated[str, {"__template_metadata__": {"kind": "llm"}}] = field(
-        default="ollama/llama3.2:1b",  # Changed to use local Ollama model
+        default="ollama/granite4:3b",  # Changed to use local Ollama model
         metadata={
             "description": "The name of the language model to use for the agent's main interactions. "
             "Should be in the form: provider/model-name. "
-            "For Ollama local models, use 'ollama/model-name' (e.g., 'ollama/llama3.2:1b')"
+            "For Ollama local models, use 'ollama/model-name' (e.g., 'ollama/granite4:3b')"
         },
     )
 

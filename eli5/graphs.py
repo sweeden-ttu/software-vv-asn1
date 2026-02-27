@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=".env", override=True)
 
 # Initialize Ollama LLM
 llm = ChatOllama(
-    model="llama3.2:1b",
+    model="granite4:3b",
     base_url="http://localhost:11434",
     temperature=0,
 )
