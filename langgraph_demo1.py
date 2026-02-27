@@ -36,10 +36,10 @@ def run_question_code(state: State):
 # --- Node 3: beautify (optionally using an LLM) ---
 def beautify(state: State):
     # If you want: uncomment Ollama call to rewrite the answer nicely.
-    llm = ChatOllama(model="granite4:3b", temperature=0)
-    prompt = f"Rewrite this politely in one sentence: {state['answer']}"
-    pretty = llm.invoke(prompt).content
-    return {"answer": pretty}
+     llm = ChatOllama(model="granite4:3b", temperature=0)
+     prompt = f"Rewrite this politely in one sentence: {state['answer']}"
+     pretty = llm.invoke(prompt).content
+     return {"answer": pretty}
 
     return {"answer": state["answer"] + " (beautified)"}
 
